@@ -192,8 +192,17 @@ variable (x y z : X)
 #check (dist_self x : dist x x = 0)
 #check (dist_comm x y : dist x y = dist y x)
 #check (dist_triangle x y z : dist x z ≤ dist x y + dist y z)
+#check nonneg_of_mul_nonneg_left
 
 example (x y : X) : 0 ≤ dist x y := by
-  sorry
+  -- dist x x ≤ dist x y + dist y x = 2 * dist x y
+  have h : 0 ≤ dist x y * 2:= by
+    calc
+      0 = dist x x := (dist_self x).symm
+      _ ≤ dist x y + dist y x := dist_triangle x y x
+      _ = dist x y + dist x y := by rw [dist_comm y x]
+      _ = 2 * dist x y := by rw [two_mul]
+      _ = dist x y * 2 := by rw [mul_comm]
+  exact nonneg_of_mul_nonneg_left h (by simp)
 
 end
