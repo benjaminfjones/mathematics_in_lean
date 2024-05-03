@@ -135,14 +135,53 @@ variable (a b c : R)
 
 #check (mul_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a * b)
 
-example (h : a ≤ b) : 0 ≤ b - a := by
-  sorry
+-- try to prove `mul_nonneg` anyway
+example : 0 ≤ a → 0 ≤ b → 0 ≤ a * b := by
+  intro ha hb
+  apply Or.elim (eq_or_lt_of_le ha)
+  . intro haz; rw [← haz, zero_mul]
+  . apply Or.elim (eq_or_lt_of_le hb)
+    . intro hbz _; rw [← hbz, mul_zero]
+    . intro hap hbp
+      apply le_of_lt
+      apply mul_pos
+      repeat assumption
 
-example (h: 0 ≤ b - a) : a ≤ b := by
-  sorry
+
+theorem nonneg_sub_of_le (h : a ≤ b) : 0 ≤ b - a := by
+  have h1 : -a + a ≤ -a + b := (add_le_add_left h) (-a)
+  have h2 : 0 ≤ -a + b := by
+    rw [add_comm (-a) a, add_neg_self] at h1
+    assumption
+  rw [add_comm] at h2
+  rw [← Ring.sub_eq_add_neg] at h2
+  assumption
+
+-- alternate version, working backwards
+example (h : a ≤ b) : 0 ≤ b - a := by
+  rw [Ring.sub_eq_add_neg]
+  rw [add_comm]
+  rw [← add_neg_self a]
+  rw [add_comm]
+  apply (add_le_add_left h)
+
+theorem le_of_nonneg_sub (h: 0 ≤ b - a) : a ≤ b := by
+  rw [← zero_add b]
+  rw [← add_neg_self a]
+  rw [add_assoc]
+  nth_rw 1 [← add_zero a]
+  apply add_le_add_left
+  rw [add_comm]
+  rw [← Ring.sub_eq_add_neg]
+  assumption
 
 example (h : a ≤ b) (h' : 0 ≤ c) : a * c ≤ b * c := by
-  sorry
+  have h1 : 0 ≤ b - a := nonneg_sub_of_le a b h
+  have h2: 0 ≤ (b - a)*c := mul_nonneg h1 h'
+  have h3 : 0 ≤ b*c - a*c := by
+    rw [mul_sub_right_distrib] at h2
+    assumption
+  exact le_of_nonneg_sub (a*c) (b*c) h3
 
 end
 
