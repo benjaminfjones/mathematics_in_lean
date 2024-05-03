@@ -118,11 +118,37 @@ section
 variable {α : Type*} [Lattice α]
 variable (a b c : α)
 
-example (h : ∀ x y z : α, x ⊓ (y ⊔ z) = x ⊓ y ⊔ x ⊓ z) : a ⊔ b ⊓ c = (a ⊔ b) ⊓ (a ⊔ c) := by
-  sorry
+-- precedence check
+example : a ⊔ (b ⊓ c) = a ⊔ b ⊓ c := by rfl
 
+-- `inf_sup_left` implies `sup_inf_left`
+example (h : ∀ x y z : α, x ⊓ (y ⊔ z) = x ⊓ y ⊔ x ⊓ z) : a ⊔ (b ⊓ c) = (a ⊔ b) ⊓ (a ⊔ c) := by
+  -- backwards starting with RHS:
+  -- (a ⊔ b) ⊓ (a ⊔ c)
+  -- ((a ⊔ b) ⊓ a)) ⊔ ((a ⊔ b) ⊓ c) := by rw [h]
+  -- a ⊔ ((a ⊔ b) ⊓ c) := by rw [absorb1]
+  -- a ⊔ (a ⊓ c) ⊔ (b ⊓ c) := by rw [h]
+  -- a ⊔ (b ⊓ c) := by absorb2
+  calc
+    a ⊔ b ⊓ c = (a ⊔ (a ⊓ c)) ⊔ b ⊓ c := by rw [absorb2]
+            _ = a ⊔ ((c ⊓ a) ⊔ (c ⊓ b))       := by rw [sup_assoc, inf_comm a c, inf_comm b c]
+            _ = a ⊔ (c ⊓ (a ⊔ b))             := by rw [← h]
+            _ = (a ⊓ (a ⊔ b)) ⊔ (c ⊓ (a ⊔ b)) := by rw [absorb1]
+            _ = ((a ⊔ b) ⊓ a) ⊔ (c ⊓ (a ⊔ b)) := by rw [inf_comm a (a ⊔ b)]
+            _ = ((a ⊔ b) ⊓ a) ⊔ ((a ⊔ b) ⊓ c) := by rw [inf_comm (a ⊔ b) c]
+            _ = (a ⊔ b) ⊓ (a ⊔ c)             := by rw [h]
+
+-- `sup_inf_left` implies `inf_sup_left`
 example (h : ∀ x y z : α, x ⊔ y ⊓ z = (x ⊔ y) ⊓ (x ⊔ z)) : a ⊓ (b ⊔ c) = a ⊓ b ⊔ a ⊓ c := by
-  sorry
+  have hr : a ⊓ b ⊔ a ⊓ c = a ⊓ (b ⊔ c) := by
+    calc
+      a ⊓ b ⊔ a ⊓ c = ((a ⊓ b) ⊔ a) ⊓ ((a ⊓ b) ⊔ c)  := by rw [h]
+                  _ = a ⊓ ((a ⊓ b) ⊔ c)              := by rw [sup_comm, absorb2]
+                  _ = a ⊓ ((c ⊔ a) ⊓ (c ⊔ b))        := by rw [sup_comm, h]
+                  _ = (a ⊓ (a ⊔ c)) ⊓ (c ⊔ b)        := by rw [inf_assoc, sup_comm]
+                  _ = a ⊓ (c ⊔ b)                    := by rw [absorb1]
+                  _ = a ⊓ (b ⊔ c)                    := by rw [sup_comm]
+  exact hr.symm
 
 end
 
