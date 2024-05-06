@@ -32,11 +32,18 @@ example (h : ∀ a, ∃ x, f x > a) : ¬FnHasUb f := by
   have : f x ≤ a := fnuba x
   linarith
 
-example (h : ∀ a, ∃ x, f x < a) : ¬FnHasLb f :=
-  sorry
+example (h : ∀ a, ∃ x, f x < a) : ¬FnHasLb f := by
+  rintro ⟨ a, flba ⟩
+  rcases h a with ⟨ w, hw ⟩
+  have haw : a ≤ f w := flba w
+  -- linarith closes the goal here
+  have : a < a := lt_of_le_of_lt haw hw
+  apply lt_irrefl a this
 
-example : ¬FnHasUb fun x ↦ x :=
-  sorry
+example : ¬FnHasUb fun x ↦ x := by
+  rintro ⟨ a, flba ⟩
+  have : a + 1 ≤ a := flba (a+1)
+  linarith
 
 #check (not_le_of_gt : a > b → ¬a ≤ b)
 #check (not_lt_of_ge : a ≥ b → ¬a < b)
@@ -44,7 +51,8 @@ example : ¬FnHasUb fun x ↦ x :=
 #check (le_of_not_gt : ¬a > b → a ≤ b)
 
 example (h : Monotone f) (h' : f a < f b) : a < b := by
-  sorry
+  have : a ≤ b := by apply h (le_of_lt h')
+
 
 example (h : a ≤ b) (h' : f b < f a) : ¬Monotone f := by
   sorry
@@ -136,4 +144,3 @@ example (h : 0 < 0) : a > 37 := by
   contradiction
 
 end
-
