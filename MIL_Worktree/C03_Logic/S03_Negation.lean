@@ -51,21 +51,45 @@ example : ¬FnHasUb fun x ↦ x := by
 #check (le_of_not_gt : ¬a > b → a ≤ b)
 
 example (h : Monotone f) (h' : f a < f b) : a < b := by
-  have : a ≤ b := by apply h (le_of_lt h')
-
+  apply lt_of_not_ge
+  intro hab
+  have : f b < f b :=
+    calc
+      f b ≤ f a := by apply h hab
+        _ < f b := by assumption
+  exact lt_irrefl (f b) this
 
 example (h : a ≤ b) (h' : f b < f a) : ¬Monotone f := by
-  sorry
+  intro hm
+  have : f b < f b :=
+    calc
+      f b < f a := by assumption
+        _ ≤ f b := by apply hm h
+  exact lt_irrefl (f b) this
 
 example : ¬∀ {f : ℝ → ℝ}, Monotone f → ∀ {a b}, f a ≤ f b → a ≤ b := by
   intro h
-  let f := fun x : ℝ ↦ (0 : ℝ)
-  have monof : Monotone f := by sorry
+  let f := fun _ : ℝ ↦ (0 : ℝ)
+  have monof : Monotone f := by
+    intro a b _
+    apply le_refl  -- `f a` and `f b` are unfolded automatically
   have h' : f 1 ≤ f 0 := le_refl _
-  sorry
+  have h'' : 1 ≤ 0 := h monof h'
+  have obv : (0 : ℝ) < 1 := by norm_num
+  exact not_le_of_gt obv h''
 
 example (x : ℝ) (h : ∀ ε > 0, x < ε) : x ≤ 0 := by
-  sorry
+  apply le_of_not_gt
+  intro hxp
+  let y := x/2
+  have hylx : y < x := div_two_lt_of_pos hxp
+  have hyp : 0 < y := half_pos hxp
+  have hxly : x < y := h y hyp
+  apply lt_irrefl y
+  show y < y
+  calc
+    y < x := hylx
+    _ < y := hxly
 
 end
 
