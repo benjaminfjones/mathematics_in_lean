@@ -97,30 +97,38 @@ section
 variable {α : Type*} (P : α → Prop) (Q : Prop)
 
 example (h : ¬∃ x, P x) : ∀ x, ¬P x := by
-  sorry
+  intro x hx
+  exact h ⟨ x, hx ⟩
 
 example (h : ∀ x, ¬P x) : ¬∃ x, P x := by
-  sorry
+  rintro ⟨ w, hw ⟩
+  exact h w hw
 
-example (h : ¬∀ x, P x) : ∃ x, ¬P x := by
-  sorry
+-- Uses classical (via `by_contra`), below
+-- example (h : ¬∀ x, P x) : ∃ x, ¬P x := by
+--   sorry
 
 example (h : ∃ x, ¬P x) : ¬∀ x, P x := by
-  sorry
+  intro ha
+  let ⟨ w, hw ⟩ := h
+  exact hw (ha w)
 
 example (h : ¬∀ x, P x) : ∃ x, ¬P x := by
   by_contra h'
   apply h
+
+  show ∀ x, P x
   intro x
-  show P x
   by_contra h''
   exact h' ⟨x, h''⟩
 
 example (h : ¬¬Q) : Q := by
-  sorry
+  by_contra h'
+  exact h h'
 
 example (h : Q) : ¬¬Q := by
-  sorry
+  intro h'
+  exact h' h
 
 end
 
@@ -128,7 +136,18 @@ section
 variable (f : ℝ → ℝ)
 
 example (h : ¬FnHasUb f) : ∀ a, ∃ x, f x > a := by
-  sorry
+  intro a
+  by_contra hc
+  -- push negation through `hc`
+  -- ∀ x, f x ≤ a
+  have hf : FnUb f a := by
+    intro x
+    by_contra h'
+    apply hc
+    use x
+    exact lt_of_not_ge h'
+  have : FnHasUb f := by use a
+  exact h this
 
 example (h : ¬∀ a, ∃ x, f x > a) : FnHasUb f := by
   push_neg at h
@@ -140,7 +159,10 @@ example (h : ¬FnHasUb f) : ∀ a, ∃ x, f x > a := by
   exact h
 
 example (h : ¬Monotone f) : ∃ x y, x ≤ y ∧ f y < f x := by
-  sorry
+  by_contra hc
+  push_neg at hc
+  -- `hc` is now exactly `Monotone f`
+  exact h hc
 
 example (h : ¬FnHasUb f) : ∀ a, ∃ x, f x > a := by
   contrapose! h
@@ -164,7 +186,7 @@ example (h : 0 < 0) : a > 37 :=
   absurd h (lt_irrefl 0)
 
 example (h : 0 < 0) : a > 37 := by
-  have h' : ¬0 < 0 := lt_irrefl 0
+  have : ¬0 < 0 := lt_irrefl 0
   contradiction
 
 end
