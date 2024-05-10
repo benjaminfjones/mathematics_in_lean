@@ -126,13 +126,29 @@ example {x y : ℝ} : x ≤ y ∧ ¬y ≤ x ↔ x ≤ y ∧ x ≠ y :=
   ⟨ fun h => ⟨ h.left, fun hxy => h.right (le_of_eq hxy.symm) ⟩,
     fun h => ⟨ h.left, fun hylx => h.right (eq_of_le_of_le h.left hylx) ⟩ ⟩
 
-
+#check pow_two_nonneg
 theorem aux {x y : ℝ} (h : x ^ 2 + y ^ 2 = 0) : x = 0 :=
-  have h' : x ^ 2 = 0 := by sorry
+  have h' : x ^ 2 = 0 := by linarith [pow_two_nonneg x, pow_two_nonneg y]
   pow_eq_zero h'
 
-example (x y : ℝ) : x ^ 2 + y ^ 2 = 0 ↔ x = 0 ∧ y = 0 :=
-  sorry
+example (x y : ℝ) : x ^ 2 + y ^ 2 = 0 ↔ x = 0 ∧ y = 0 := by
+  constructor
+  . intro h
+    constructor
+    . exact aux h
+    . rw [add_comm] at h
+      exact aux h
+  -- alternate → , but more complicated:
+  -- . intro h
+  --   have hx : x = 0 := aux h
+  --   have hy : y = 0 := by
+  --     rw [hx, zero_pow (by norm_num), zero_add] at h
+  --     apply pow_eq_zero h
+  --   exact ⟨hx, hy⟩
+
+  . rintro ⟨rfl, rfl⟩  -- rfl pattern trick
+    linarith
+
 
 section
 
@@ -153,7 +169,10 @@ theorem not_monotone_iff {f : ℝ → ℝ} : ¬Monotone f ↔ ∃ x y, x ≤ y �
   rfl
 
 example : ¬Monotone fun x : ℝ ↦ -x := by
-  sorry
+  rw [Monotone]
+  push_neg
+  use 0, 1
+  constructor <;> norm_num
 
 section
 variable {α : Type*} [PartialOrder α]
@@ -161,7 +180,9 @@ variable (a b : α)
 
 example : a < b ↔ a ≤ b ∧ a ≠ b := by
   rw [lt_iff_le_not_le]
-  sorry
+  constructor
+  . exact fun h => ⟨ h.1, fun hanb => h.2 (le_of_eq hanb.symm) ⟩
+  . exact fun h => ⟨ h.1, fun hbla => h.2 (eq_of_le_of_le h.1 hbla) ⟩
 
 end
 
@@ -171,10 +192,17 @@ variable (a b c : α)
 
 example : ¬a < a := by
   rw [lt_iff_le_not_le]
-  sorry
+  rintro ⟨h1, h2⟩
+  exact h2 h1
 
 example : a < b → b < c → a < c := by
   simp only [lt_iff_le_not_le]
-  sorry
+  rintro ⟨hab1, _hab2⟩
+  rintro ⟨hbc1, hbc2⟩
+  have hac : a ≤ c := le_trans hab1 hbc1
+  constructor
+  . assumption
+  . intro hca
+    exact hbc2 (le_trans hca hab1)
 
 end
