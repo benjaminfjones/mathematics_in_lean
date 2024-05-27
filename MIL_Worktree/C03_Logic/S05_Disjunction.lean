@@ -160,25 +160,80 @@ example {m n k : ℕ} (h : m ∣ n ∨ m ∣ k) : m ∣ n * k := by
     apply dvd_mul_right
 
 example {z : ℝ} (h : ∃ x y, z = x ^ 2 + y ^ 2 ∨ z = x ^ 2 + y ^ 2 + 1) : z ≥ 0 := by
-  sorry
+  rcases h with ⟨ x, ⟨ y, rfl | rfl ⟩ ⟩ <;> linarith [sq_nonneg x, sq_nonneg y]
 
 example {x : ℝ} (h : x ^ 2 = 1) : x = 1 ∨ x = -1 := by
-  sorry
+  have h1 : (x+1)*(x-1) = 0 := by
+    calc (x+1)*(x-1) = x^2 - 1 := by ring
+         _           = 0 := by rw [h]; apply sub_self
+  have h2 : x+1 = 0 ∨ x-1 = 0 := eq_zero_or_eq_zero_of_mul_eq_zero h1
+  rcases h2 with h1 | hm1
+  . right; exact (neg_eq_of_add_eq_zero_left h1).symm
+  . left; rw [(neg_eq_of_add_eq_zero_left hm1).symm, neg_neg]
 
+-- same exact proof, but substituting 1 ↦ y
 example {x y : ℝ} (h : x ^ 2 = y ^ 2) : x = y ∨ x = -y := by
-  sorry
+  have h1 : (x+y)*(x-y) = 0 := by
+    calc (x+y)*(x-y) = x^2 - y^2 := by ring
+         _           = 0 := by rw [h]; apply sub_self
+  have h2 : x+y = 0 ∨ x-y = 0 := eq_zero_or_eq_zero_of_mul_eq_zero h1
+  rcases h2 with h1 | hm1
+  . right; exact (neg_eq_of_add_eq_zero_left h1).symm
+  . left; rw [(neg_eq_of_add_eq_zero_left hm1).symm, neg_neg]
 
 section
 variable {R : Type*} [CommRing R] [IsDomain R]
 variable (x y : R)
 
 example (h : x ^ 2 = 1) : x = 1 ∨ x = -1 := by
-  sorry
+  have h1 : (x+1)*(x-1) = 0 := by
+    calc (x+1)*(x-1) = x^2 - 1 := by ring
+         _           = 0 := by rw [h]; apply sub_self
+  have h2 : x+1 = 0 ∨ x-1 = 0 := eq_zero_or_eq_zero_of_mul_eq_zero h1
+  rcases h2 with h1 | hm1
+  . right; exact (neg_eq_of_add_eq_zero_left h1).symm
+  -- see below
+  -- . left; rw [(neg_eq_of_add_eq_zero_left hm1).symm, neg_neg]
+  . left
+    calc x = x - 1 + 1 := by ring
+         _ = 1 := by rw [hm1, zero_add]
 
 example (h : x ^ 2 = y ^ 2) : x = y ∨ x = -y := by
-  sorry
+  have h1 : (x+y)*(x-y) = 0 := by
+    calc (x+y)*(x-y) = x^2 - y^2 := by ring
+         _           = 0 := by rw [h]; apply sub_self
+  have h2 : x+y = 0 ∨ x-y = 0 := eq_zero_or_eq_zero_of_mul_eq_zero h1
+  rcases h2 with h1 | hm1
+  . right; exact (neg_eq_of_add_eq_zero_left h1).symm
+  -- In the more general CommRing context, the first rewrite below fails because of metavariable
+  -- unification. Perhaps Lean can't deduce the SubtractionMonoid instance? Not sure...
+  -- . left; rw [(neg_eq_of_add_eq_zero_left hm1).symm, neg_neg]
+  . left
+    calc x = x - y + y := by ring
+         _ = y := by rw [hm1, zero_add]
 
 end
+
+-- Try to prove the first theorem above in a general, possibly non-commutative, ring.
+-- The proof goes through exactly as before, except the use of `noncomm_ring` instead
+-- of `ring`.
+section
+variable {R : Type*} [Ring R] [IsDomain R]
+variable (x y : R)
+
+example (h : x ^ 2 = 1) : x = 1 ∨ x = -1 := by
+  have h1 : (x+1)*(x-1) = 0 := by
+    calc (x+1)*(x-1) = x^2 - 1 := by noncomm_ring
+         _           = 0 := by rw [h]; apply sub_self
+  have h2 : x+1 = 0 ∨ x-1 = 0 := eq_zero_or_eq_zero_of_mul_eq_zero h1
+  rcases h2 with h1 | hm1
+  . right; exact (neg_eq_of_add_eq_zero_left h1).symm
+  . left
+    calc x = x - 1 + 1 := by noncomm_ring
+         _ = 1 := by rw [hm1, zero_add]
+
+end
+
 
 example (P : Prop) : ¬¬P → P := by
   intro h
@@ -190,7 +245,20 @@ example (P : Prop) : ¬¬P → P := by
   intro h
   by_cases h' : P
   · assumption
-  contradiction
+  . contradiction
 
 example (P Q : Prop) : P → Q ↔ ¬P ∨ Q := by
-  sorry
+  by_cases h : P
+
+  . constructor
+    . intro hpq
+      have hq : Q := hpq h
+      right; assumption
+    . intro hpoq p
+      rcases hpoq
+      . contradiction
+      . assumption
+
+  . constructor
+    . intro; left; assumption
+    . intros; contradiction
