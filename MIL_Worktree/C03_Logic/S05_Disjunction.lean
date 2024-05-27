@@ -59,19 +59,87 @@ example : x < |y| → x < y ∨ x < -y := by
 namespace MyAbs
 
 theorem le_abs_self (x : ℝ) : x ≤ |x| := by
-  sorry
+  unfold abs
+  rw [le_sup_iff]
+  left
+  apply le_refl
 
 theorem neg_le_abs_self (x : ℝ) : -x ≤ |x| := by
-  sorry
+  unfold abs
+  rw [le_sup_iff]
+  right
+  apply le_refl
 
 theorem abs_add (x y : ℝ) : |x + y| ≤ |x| + |y| := by
-  sorry
+  by_contra h
+  have h0 : abs x + abs y < abs (x + y) := lt_of_not_le h
+
+  -- In `h1` and `h2`, it's not clear if using `linarith` is circular
+  have h1 : x + y < abs (x + y) := by  -- linarith [le_abs_self x, le_abs_self y]
+    calc abs (x + y) > abs x + abs y := h0
+         _           ≥ x + abs y := by apply add_le_add_right; exact le_abs_self x
+         _           ≥ x + y := by apply add_le_add_left; exact le_abs_self y
+
+  have h2 : -(x + y) < abs (x + y) := by  -- linarith [neg_le_abs_self x, neg_le_abs_self y]
+    calc abs (x + y) > abs x + abs y := h0
+         _           ≥ -x + abs y := by apply add_le_add_right; exact neg_le_abs_self x
+         _           ≥ -x + -y := by apply add_le_add_left; exact neg_le_abs_self y
+         _           ≥ -(x + y) := by rw [neg_add]
+
+  rcases le_or_gt 0 (x+y) with h | h
+  . rw [abs_of_nonneg h] at h1
+    linarith
+  . rw [abs_of_neg h] at h2
+    linarith
+  -- Alternate route:
+  --
+  -- suffices abs (x+y) - abs y ≤ abs x by linarith
+  -- suffices abs (x+y) - abs y ≤ x ∨ abs (x+y) - abs y ≤ -x by {
+  --   rcases this with h | h
+  --   . exact le_trans h (le_abs_self _)
+  --   . exact le_trans h (neg_le_abs_self _)
+  -- }
+  -- rcases le_or_gt 0 x with hx | hx
+  -- . sorry
+  -- . sorry
+
 
 theorem lt_abs : x < |y| ↔ x < y ∨ x < -y := by
-  sorry
+  constructor
+  . intro h
+    rcases le_or_gt 0 y with i | i
+    . left; rw [abs_of_nonneg i] at h; assumption
+    . right; rw [abs_of_neg i] at h; assumption
+  . intro hxy
+    rcases hxy with h | h
+    . exact lt_of_lt_of_le h (le_abs_self y)
+    . exact lt_of_lt_of_le h (neg_le_abs_self y)
 
 theorem abs_lt : |x| < y ↔ -y < x ∧ x < y := by
-  sorry
+  constructor
+  . intro h
+    rcases le_or_gt 0 x with i | i
+    . rw [abs_of_nonneg i] at h
+      have h0 : -x ≤ x := by exact neg_le_self i
+      have h1 : -y < x := by
+        calc -y < -x := by exact neg_lt_neg h
+             _  ≤ x := h0
+      exact ⟨ h1, h ⟩
+    . rw [abs_of_neg i] at h
+      have h0 : -y < x := by rw [← neg_neg y] at h; exact lt_of_neg_lt_neg h
+      have hnxp : 0 ≤ -x := by apply le_of_neg_le_neg; simp only [neg_neg, neg_zero]; exact le_of_lt i
+      have h1 : x < y := by
+        -- some contortion here in the name of using only short theorems
+        calc y > -x := h
+             _ ≥ x := by
+               show x ≤ -x
+               nth_rw 1 [← neg_neg x]
+               apply neg_le_self hnxp
+      exact ⟨ h0, h1 ⟩
+  . rintro ⟨ h0, h1 ⟩
+    rcases le_or_gt 0 x with h | h
+    . rw [abs_of_nonneg h]; assumption
+    . rw [abs_of_neg h]; apply lt_of_neg_lt_neg; rw [neg_neg]; assumption
 
 end MyAbs
 
@@ -126,4 +194,3 @@ example (P : Prop) : ¬¬P → P := by
 
 example (P Q : Prop) : P → Q ↔ ¬P ∨ Q := by
   sorry
-
