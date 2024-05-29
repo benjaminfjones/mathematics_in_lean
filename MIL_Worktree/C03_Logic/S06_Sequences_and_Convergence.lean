@@ -6,23 +6,28 @@ namespace C03S06
 def ConvergesTo (s : ℕ → ℝ) (a : ℝ) :=
   ∀ ε > 0, ∃ N, ∀ n ≥ N, |s n - a| < ε
 
+-- Extensionality
 example : (fun x y : ℝ ↦ (x + y) ^ 2) = fun x y : ℝ ↦ x ^ 2 + 2 * x * y + y ^ 2 := by
-  ext
+  ext x y  -- name the function inputs explicitly to make the goal nicer
   ring
 
+-- Congruence
 example (a b : ℝ) : |a| = |a - b + b| := by
   congr
   ring
 
+-- `convert` applies congruence to some depth and then produces new goals for the
+-- differences
 example {a : ℝ} (h : 1 < a) : a < a * a := by
   convert (mul_lt_mul_right _).2 h
   · rw [one_mul]
   exact lt_trans zero_lt_one h
 
-theorem convergesTo_const (a : ℝ) : ConvergesTo (fun x : ℕ ↦ a) a := by
+theorem convergesTo_const (a : ℝ) : ConvergesTo (fun _ : ℕ ↦ a) a := by
   intro ε εpos
   use 0
-  intro n nge
+  intro n _nge
+  dsimp  -- unfold the fun so we have: ⊢ |a - a| < ε
   rw [sub_self, abs_zero]
   apply εpos
 
@@ -30,23 +35,41 @@ theorem convergesTo_add {s t : ℕ → ℝ} {a b : ℝ}
       (cs : ConvergesTo s a) (ct : ConvergesTo t b) :
     ConvergesTo (fun n ↦ s n + t n) (a + b) := by
   intro ε εpos
-  dsimp -- this line is not needed but cleans up the goal a bit.
+  dsimp  -- this line is not needed but cleans up the goal a bit.
   have ε2pos : 0 < ε / 2 := by linarith
   rcases cs (ε / 2) ε2pos with ⟨Ns, hs⟩
   rcases ct (ε / 2) ε2pos with ⟨Nt, ht⟩
   use max Ns Nt
-  sorry
+  intro n hn
+  have hs' : abs (s n - a) < ε / 2 := hs n (le_trans (le_max_left _ _) hn)
+  have ht' : abs (t n - b) < ε / 2 := ht n (le_trans (le_max_right _ _) hn)
+  calc
+    abs (s n + t n - (a + b)) = abs ((s n - a) + (t n - b)) := by congr; ring
+    _                         ≤ abs (s n - a) + abs (t n - b) := by apply abs_add
+    _                         < ε / 2 + abs (t n - b) := by apply add_lt_add_right hs'
+    _                         < ε / 2 + ε / 2 := by apply add_lt_add_left ht'
+    _                         ≤ ε := by norm_num
 
+-- ∀ ε > 0, ∃ N, ∀ n ≥ N, |c*s n - c*s| < ε
 theorem convergesTo_mul_const {s : ℕ → ℝ} {a : ℝ} (c : ℝ) (cs : ConvergesTo s a) :
     ConvergesTo (fun n ↦ c * s n) (c * a) := by
   by_cases h : c = 0
   · convert convergesTo_const 0
     · rw [h]
       ring
-    rw [h]
-    ring
-  have acpos : 0 < |c| := abs_pos.mpr h
-  sorry
+    . rw [h]
+      ring
+  . have acpos : 0 < |c| := abs_pos.mpr h
+    intro ε εpos
+    have εcpos : 0 < ε / abs c := div_pos εpos acpos
+    rcases cs (ε / abs c) εcpos with ⟨ N, hc ⟩
+    use N
+    dsimp
+    intro n hngtN
+    rw [← mul_sub, abs_mul c _, mul_comm]
+    apply (lt_div_iff acpos).mp
+    exact hc n hngtN
+
 
 theorem exists_abs_le_of_convergesTo {s : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) :
     ∃ N b, ∀ n, N ≤ n → |s n| < b := by
@@ -100,4 +123,3 @@ def ConvergesTo' (s : α → ℝ) (a : ℝ) :=
   ∀ ε > 0, ∃ N, ∀ n ≥ N, |s n - a| < ε
 
 end
-
