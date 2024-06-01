@@ -70,12 +70,16 @@ theorem convergesTo_mul_const {s : ℕ → ℝ} {a : ℝ} (c : ℝ) (cs : Conver
     apply (lt_div_iff acpos).mp
     exact hc n hngtN
 
-
 theorem exists_abs_le_of_convergesTo {s : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) :
     ∃ N b, ∀ n, N ≤ n → |s n| < b := by
   rcases cs 1 zero_lt_one with ⟨N, h⟩
   use N, |a| + 1
-  sorry
+  intro n hn
+  calc
+    abs (s n) = abs ((s n - a) + a) := by congr; ring
+    _         ≤ abs (s n - a) + abs a:= by apply abs_add
+    _         < 1 + abs a := by apply add_lt_add_right (h n hn)
+    _         = abs a + 1 := by rw [add_comm]
 
 theorem aux {s t : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) (ct : ConvergesTo t 0) :
     ConvergesTo (fun n ↦ s n * t n) 0 := by
@@ -83,9 +87,27 @@ theorem aux {s t : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) (ct : Converges
   dsimp
   rcases exists_abs_le_of_convergesTo cs with ⟨N₀, B, h₀⟩
   have Bpos : 0 < B := lt_of_le_of_lt (abs_nonneg _) (h₀ N₀ (le_refl _))
+  have Bnonzero : B ≠ 0 := by exact Ne.symm (ne_of_lt Bpos)
   have pos₀ : ε / B > 0 := div_pos εpos Bpos
-  rcases ct _ pos₀ with ⟨N₁, h₁⟩
-  sorry
+  rcases ct (ε / B) pos₀ with ⟨N₁, h₁⟩
+  use max N₀ N₁
+  intro n hn
+  have hnN₀ : n ≥ N₀ := le_of_max_le_left hn
+  have hnN₁ : n ≥ N₁ := le_of_max_le_right hn
+  by_cases htzero : t n = 0
+  . calc
+      abs (s n * t n - 0) = abs (s n * t n) := by rw [sub_zero]
+      _                   = abs (s n) * abs (t n) := by rw [abs_mul]
+      _                   = 0 := by rw [htzero, abs_zero, mul_zero]
+      _                   < ε := εpos
+  . let h₁' := h₁ n hnN₁
+    rw [sub_zero] at h₁'
+    calc
+      abs (s n * t n - 0) = abs (s n * t n) := by rw [sub_zero]
+      _                   = abs (s n) * abs (t n) := by rw [abs_mul]
+      _                   < B * abs (t n) := by apply (mul_lt_mul_right (abs_pos.mpr htzero)).mpr (h₀ n hnN₀)
+      _                   < B * (ε / B) := by apply (mul_lt_mul_left Bpos).mpr h₁'
+      _                   = ε := by rw [mul_div_cancel₀ ε Bnonzero]
 
 theorem convergesTo_mul {s t : ℕ → ℝ} {a b : ℝ}
       (cs : ConvergesTo s a) (ct : ConvergesTo t b) :
