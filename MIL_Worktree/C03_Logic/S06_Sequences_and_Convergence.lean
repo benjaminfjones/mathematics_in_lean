@@ -95,6 +95,7 @@ theorem aux {s t : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) (ct : Converges
   rw [sub_zero]
   let h₁' : abs (t n - 0) < ε / B := h₁ n (le_of_max_le_right hn)
   rw [sub_zero] at h₁'
+  -- using `mul_lt_mul''` somewhat simplifies the calc below
   calc
     abs (s n * t n) = abs (s n) * abs (t n) := by rw [abs_mul]
     _                   ≤ B * abs (t n)     := by apply mul_le_mul_of_nonneg_right
@@ -139,9 +140,9 @@ theorem convergesTo_unique {s : ℕ → ℝ} {a b : ℝ}
       abs (a - b) = abs ((s N - b) + (-(s N - a))) := by congr 1; ring
       _           ≤ abs (s N - b) + abs (-(s N - a)) := by apply abs_add
       _           = abs (s N - b) + abs (s N - a) := by rw [abs_neg]
-      _           < ε + abs (s N - a) := by apply add_lt_add_right absb
+      _           < ε + abs (s N - a) := by apply add_lt_add_right absb  -- add_lt_add
       _           < ε + ε := by apply add_lt_add_left absa
-      _           = abs (a - b) := by exact add_halves |a - b|
+      _           = abs (a - b) := by exact add_halves |a - b|  -- `norm_num [ε]` also works
   exact lt_irrefl _ this
 
 section
