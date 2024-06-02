@@ -120,7 +120,11 @@ theorem convergesTo_unique {s : ℕ → ℝ} {a b : ℝ}
       (sa : ConvergesTo s a) (sb : ConvergesTo s b) :
     a = b := by
   by_contra abne
-  have : |a - b| > 0 := by sorry
+  have : |a - b| > 0 := by
+    apply abs_pos.mpr
+    intro amb
+    have : a = b := by apply eq_of_sub_eq_zero amb
+    exact abne this
   let ε := |a - b| / 2
   have εpos : ε > 0 := by
     change |a - b| / 2 > 0
@@ -128,9 +132,16 @@ theorem convergesTo_unique {s : ℕ → ℝ} {a b : ℝ}
   rcases sa ε εpos with ⟨Na, hNa⟩
   rcases sb ε εpos with ⟨Nb, hNb⟩
   let N := max Na Nb
-  have absa : |s N - a| < ε := by sorry
-  have absb : |s N - b| < ε := by sorry
-  have : |a - b| < |a - b| := by sorry
+  have absa : |s N - a| < ε := hNa N (le_max_left Na Nb)
+  have absb : |s N - b| < ε := hNb N (le_max_right Na Nb)
+  have : |a - b| < |a - b| := by
+    calc
+      abs (a - b) = abs ((s N - b) + (-(s N - a))) := by congr 1; ring
+      _           ≤ abs (s N - b) + abs (-(s N - a)) := by apply abs_add
+      _           = abs (s N - b) + abs (s N - a) := by rw [abs_neg]
+      _           < ε + abs (s N - a) := by apply add_lt_add_right absb
+      _           < ε + ε := by apply add_lt_add_left absa
+      _           = abs (a - b) := by exact add_halves |a - b|
   exact lt_irrefl _ this
 
 section
