@@ -92,22 +92,17 @@ theorem aux {s t : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) (ct : Converges
   rcases ct (ε / B) pos₀ with ⟨N₁, h₁⟩
   use max N₀ N₁
   intro n hn
-  have hnN₀ : n ≥ N₀ := le_of_max_le_left hn
-  have hnN₁ : n ≥ N₁ := le_of_max_le_right hn
-  by_cases htzero : t n = 0
-  . calc
-      abs (s n * t n - 0) = abs (s n * t n) := by rw [sub_zero]
-      _                   = abs (s n) * abs (t n) := by rw [abs_mul]
-      _                   = 0 := by rw [htzero, abs_zero, mul_zero]
-      _                   < ε := εpos
-  . let h₁' := h₁ n hnN₁
-    rw [sub_zero] at h₁'
-    calc
-      abs (s n * t n - 0) = abs (s n * t n) := by rw [sub_zero]
-      _                   = abs (s n) * abs (t n) := by rw [abs_mul]
-      _                   < B * abs (t n) := by apply (mul_lt_mul_right (abs_pos.mpr htzero)).mpr (h₀ n hnN₀)
-      _                   < B * (ε / B) := by apply (mul_lt_mul_left Bpos).mpr h₁'
-      _                   = ε := by rw [mul_div_cancel₀ ε Bnonzero]
+  rw [sub_zero]
+  let h₁' : abs (t n - 0) < ε / B := h₁ n (le_of_max_le_right hn)
+  rw [sub_zero] at h₁'
+  calc
+    abs (s n * t n) = abs (s n) * abs (t n) := by rw [abs_mul]
+    _                   ≤ B * abs (t n)     := by apply mul_le_mul_of_nonneg_right
+                                                  . exact le_of_lt (h₀ n (le_of_max_le_left hn))
+                                                  . apply abs_nonneg
+    _                   < B * (ε / B)       := by apply (mul_lt_mul_left _).mpr h₁'
+                                                  exact Bpos
+    _                   = ε                 := by rw [mul_div_cancel₀ ε Bnonzero]
 
 theorem convergesTo_mul {s t : ℕ → ℝ} {a b : ℝ}
       (cs : ConvergesTo s a) (ct : ConvergesTo t b) :
