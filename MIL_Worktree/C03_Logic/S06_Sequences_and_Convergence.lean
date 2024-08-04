@@ -16,10 +16,14 @@ example (a b : ℝ) : |a| = |a - b + b| := by
   congr
   ring
 
--- `convert` applies congruence to some depth and then produces new goals for the
--- differences
+-- `convert` applies a theorem conclusion and congruence to some depth and then produces
+-- new goals for the differences
 example {a : ℝ} (h : 1 < a) : a < a * a := by
+  -- convert: b < c → b * a < c * a
   convert (mul_lt_mul_right _).2 h
+  -- goals:
+  -- 1. 1 = 1 * a
+  -- 2. 0 < a
   · rw [one_mul]
   exact lt_trans zero_lt_one h
 
@@ -37,6 +41,7 @@ theorem convergesTo_add {s t : ℕ → ℝ} {a b : ℝ}
   intro ε εpos
   dsimp  -- this line is not needed but cleans up the goal a bit.
   have ε2pos : 0 < ε / 2 := by linarith
+  -- apply main hypotheses to our chosen neighborhood
   rcases cs (ε / 2) ε2pos with ⟨Ns, hs⟩
   rcases ct (ε / 2) ε2pos with ⟨Nt, ht⟩
   use max Ns Nt
@@ -54,15 +59,14 @@ theorem convergesTo_add {s t : ℕ → ℝ} {a b : ℝ}
 theorem convergesTo_mul_const {s : ℕ → ℝ} {a : ℝ} (c : ℝ) (cs : ConvergesTo s a) :
     ConvergesTo (fun n ↦ c * s n) (c * a) := by
   by_cases h : c = 0
-  · convert convergesTo_const 0
-    · rw [h]
-      ring
-    . rw [h]
-      ring
-  . have acpos : 0 < |c| := abs_pos.mpr h
-    intro ε εpos
-    have εcpos : 0 < ε / abs c := div_pos εpos acpos
-    rcases cs (ε / abs c) εcpos with ⟨ N, hc ⟩
+  . convert convergesTo_const 0
+    <;> (rw [h]; ring)
+  . intro ε εpos
+    let εc := ε / abs c  -- convergence neighborhood, scaled by (abs c)
+    have acpos : 0 < |c| := abs_pos.mpr h
+    have εcpos : 0 < εc := div_pos εpos acpos
+
+    rcases cs εc εcpos with ⟨ N, hc ⟩
     use N
     dsimp
     intro n hngtN
@@ -85,6 +89,7 @@ theorem aux {s t : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) (ct : Converges
     ConvergesTo (fun n ↦ s n * t n) 0 := by
   intro ε εpos
   dsimp
+  -- eventual abs upper bound on (s n) implies (s n) * (t n) → 0
   rcases exists_abs_le_of_convergesTo cs with ⟨N₀, B, h₀⟩
   have Bpos : 0 < B := lt_of_le_of_lt (abs_nonneg _) (h₀ N₀ (le_refl _))
   have Bnonzero : B ≠ 0 := by exact Ne.symm (ne_of_lt Bpos)
@@ -92,9 +97,8 @@ theorem aux {s t : ℕ → ℝ} {a : ℝ} (cs : ConvergesTo s a) (ct : Converges
   rcases ct (ε / B) pos₀ with ⟨N₁, h₁⟩
   use max N₀ N₁
   intro n hn
-  rw [sub_zero]
   let h₁' : abs (t n - 0) < ε / B := h₁ n (le_of_max_le_right hn)
-  rw [sub_zero] at h₁'
+  rw [sub_zero] at *
   -- using `mul_lt_mul''` somewhat simplifies the calc below
   calc
     abs (s n * t n) = abs (s n) * abs (t n) := by rw [abs_mul]
