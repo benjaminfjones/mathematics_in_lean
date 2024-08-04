@@ -13,11 +13,11 @@
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="_static/jquery.js?v=5d32c60e"></script>
-        <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-        <script src="_static/documentation_options.js?v=2709fde1"></script>
-        <script src="_static/doctools.js?v=888ff710"></script>
-        <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
@@ -94,13 +94,13 @@
            <div itemprop="articleBody">
              
   <section id="basics">
-<span id="id1"></span><h1><span class="section-number">2. </span>Basics<a class="headerlink" href="#basics" title="Link to this heading">&#61633;</a></h1>
+<span id="id1"></span><h1><span class="section-number">2. </span>Basics<a class="headerlink" href="#basics" title="Permalink to this heading">&#61633;</a></h1>
 <p>This chapter is designed to introduce you to the nuts and
 bolts of mathematical reasoning in Lean: calculating,
 applying lemmas and theorems,
 and reasoning about generic structures.</p>
 <section id="calculating">
-<h2><span class="section-number">2.1. </span>Calculating<a class="headerlink" href="#calculating" title="Link to this heading">&#61633;</a></h2>
+<h2><span class="section-number">2.1. </span>Calculating<a class="headerlink" href="#calculating" title="Permalink to this heading">&#61633;</a></h2>
 <p>We generally learn to carry out mathematical calculations
 without thinking of them as proofs.
 But when we justify each step in a calculation,
@@ -137,7 +137,7 @@ in VS Code.
 The symbol doesn&#8217;t appear until you hit space or the tab key.
 If you hover over a symbol when reading a Lean file,
 VS Code will show you the syntax that can be used to enter it.
-If you are curious to see all available abbreviations, you can hit Ctrl-Shift-p
+If you are curious to see all available abbreviations, you can hit Ctrl-Shift-P
 and then type abbreviations to get access to the <code class="docutils literal notranslate"><span class="pre">Lean</span> <span class="pre">4:</span> <span class="pre">Show</span> <span class="pre">all</span> <span class="pre">abbreviations</span></code> command.
 If your keyboard does not have an easily accessible backslash,
 you can change the leading character by changing the
@@ -391,7 +391,7 @@ occurrence of <code class="docutils literal notranslate"><span class="pre">a</sp
 </div>
 </section>
 <section id="proving-identities-in-algebraic-structures">
-<span id="id2"></span><h2><span class="section-number">2.2. </span>Proving Identities in Algebraic Structures<a class="headerlink" href="#proving-identities-in-algebraic-structures" title="Link to this heading">&#61633;</a></h2>
+<span id="id2"></span><h2><span class="section-number">2.2. </span>Proving Identities in Algebraic Structures<a class="headerlink" href="#proving-identities-in-algebraic-structures" title="Permalink to this heading">&#61633;</a></h2>
 <p id="index-7">Mathematically, a ring consists of a collection of objects,
 <span class="math notranslate nohighlight">\(R\)</span>, operations <span class="math notranslate nohighlight">\(+\)</span> <span class="math notranslate nohighlight">\(\times\)</span>, and constants <span class="math notranslate nohighlight">\(0\)</span>
 and <span class="math notranslate nohighlight">\(1\)</span>, and an operation <span class="math notranslate nohighlight">\(x \mapsto -x\)</span> such that:</p>
@@ -711,7 +711,7 @@ but also for the convenience of using a shorter name for the
 tactic that deals with commutative rings, since it is used more often.</p>
 </section>
 <section id="using-theorems-and-lemmas">
-<span id="id3"></span><h2><span class="section-number">2.3. </span>Using Theorems and Lemmas<a class="headerlink" href="#using-theorems-and-lemmas" title="Link to this heading">&#61633;</a></h2>
+<span id="id3"></span><h2><span class="section-number">2.3. </span>Using Theorems and Lemmas<a class="headerlink" href="#using-theorems-and-lemmas" title="Permalink to this heading">&#61633;</a></h2>
 <p id="index-16">Rewriting is great for proving equations,
 but what about other sorts of theorems?
 For example, how can we prove an inequality,
@@ -978,7 +978,7 @@ to two goals; see <a class="reference internal" href="C03_Logic.html#conjunction
 You are well on your way to becoming a master formalizer.</p>
 </section>
 <section id="more-examples-using-apply-and-rw">
-<span id="more-on-order-and-divisibility"></span><h2><span class="section-number">2.4. </span>More examples using apply and rw<a class="headerlink" href="#more-examples-using-apply-and-rw" title="Link to this heading">&#61633;</a></h2>
+<span id="more-on-order-and-divisibility"></span><h2><span class="section-number">2.4. </span>More examples using apply and rw<a class="headerlink" href="#more-examples-using-apply-and-rw" title="Permalink to this heading">&#61633;</a></h2>
 <p id="index-21">The <code class="docutils literal notranslate"><span class="pre">min</span></code> function on the real numbers is uniquely characterized
 by the following three facts:</p>
 <div class="highlight-lean notranslate"><div class="highlight"><pre><span></span><span class="k">#check</span> <span class="o">(</span><span class="n">min_le_left</span> <span class="n">a</span> <span class="n">b</span> <span class="o">:</span> <span class="n">min</span> <span class="n">a</span> <span class="n">b</span> <span class="bp">&#8804;</span> <span class="n">a</span><span class="o">)</span>
@@ -1081,7 +1081,7 @@ You can use either of the tricks just described to shorten the first.</p>
 the way that multiplication distributes over addition,
 and vice-versa.
 In other words, on the real numbers, we have the identity
-<code class="docutils literal notranslate"><span class="pre">min</span> <span class="pre">a</span> <span class="pre">(max</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">&#8804;</span> <span class="pre">max</span> <span class="pre">(min</span> <span class="pre">a</span> <span class="pre">b)</span> <span class="pre">(min</span> <span class="pre">a</span> <span class="pre">c)</span></code>
+<code class="docutils literal notranslate"><span class="pre">min</span> <span class="pre">a</span> <span class="pre">(max</span> <span class="pre">b</span> <span class="pre">c)</span> <span class="pre">=</span> <span class="pre">max</span> <span class="pre">(min</span> <span class="pre">a</span> <span class="pre">b)</span> <span class="pre">(min</span> <span class="pre">a</span> <span class="pre">c)</span></code>
 as well as the corresponding version with <code class="docutils literal notranslate"><span class="pre">max</span></code> and <code class="docutils literal notranslate"><span class="pre">min</span></code>
 switched.
 But in the next section we will see that this does <em>not</em> follow
@@ -1179,7 +1179,7 @@ You can use <code class="docutils literal notranslate"><span class="pre">_root_.
 either one will work.</p>
 </section>
 <section id="proving-facts-about-algebraic-structures">
-<span id="id4"></span><h2><span class="section-number">2.5. </span>Proving Facts about Algebraic Structures<a class="headerlink" href="#proving-facts-about-algebraic-structures" title="Link to this heading">&#61633;</a></h2>
+<span id="id4"></span><h2><span class="section-number">2.5. </span>Proving Facts about Algebraic Structures<a class="headerlink" href="#proving-facts-about-algebraic-structures" title="Permalink to this heading">&#61633;</a></h2>
 <p id="index-27">In <a class="reference internal" href="#proving-identities-in-algebraic-structures"><span class="std std-numref">Section 2.2</span></a>,
 we saw that many common identities governing the real numbers hold
 in more general classes of algebraic structures,
@@ -1204,7 +1204,7 @@ letters like <code class="docutils literal notranslate"><span class="pre">&#945;
 (entered as <code class="docutils literal notranslate"><span class="pre">\a</span></code>, <code class="docutils literal notranslate"><span class="pre">\b</span></code>, and <code class="docutils literal notranslate"><span class="pre">\g</span></code>)
 for arbitrary types.
 The library often uses letters like <code class="docutils literal notranslate"><span class="pre">R</span></code> and <code class="docutils literal notranslate"><span class="pre">G</span></code>
-for the carries of algebraic structures like rings and groups,
+for the carriers of algebraic structures like rings and groups,
 respectively,
 but in general Greek letters are used for types,
 especially when there is little or no structure
@@ -1216,7 +1216,7 @@ Saying that <code class="docutils literal notranslate"><span class="pre">x</span
 is equivalent to saying that it is less-than-or-equal to <code class="docutils literal notranslate"><span class="pre">y</span></code>
 and not equal to <code class="docutils literal notranslate"><span class="pre">y</span></code>.</p>
 <div class="highlight-lean notranslate"><div class="highlight"><pre><span></span><span class="k">#check</span> <span class="n">x</span> <span class="bp">&lt;</span> <span class="n">y</span>
-<span class="k">#check</span> <span class="o">(</span><span class="n">lt_irrefl</span> <span class="n">x</span> <span class="o">:</span> <span class="bp">&#172;</span><span class="n">x</span> <span class="bp">&lt;</span> <span class="n">x</span><span class="o">)</span>
+<span class="k">#check</span> <span class="o">(</span><span class="n">lt_irrefl</span> <span class="n">x</span> <span class="o">:</span> <span class="bp">&#172;</span> <span class="o">(</span><span class="n">x</span> <span class="bp">&lt;</span> <span class="n">x</span><span class="o">))</span>
 <span class="k">#check</span> <span class="o">(</span><span class="n">lt_trans</span> <span class="o">:</span> <span class="n">x</span> <span class="bp">&lt;</span> <span class="n">y</span> <span class="bp">&#8594;</span> <span class="n">y</span> <span class="bp">&lt;</span> <span class="n">z</span> <span class="bp">&#8594;</span> <span class="n">x</span> <span class="bp">&lt;</span> <span class="n">z</span><span class="o">)</span>
 <span class="k">#check</span> <span class="o">(</span><span class="n">lt_of_le_of_lt</span> <span class="o">:</span> <span class="n">x</span> <span class="bp">&#8804;</span> <span class="n">y</span> <span class="bp">&#8594;</span> <span class="n">y</span> <span class="bp">&lt;</span> <span class="n">z</span> <span class="bp">&#8594;</span> <span class="n">x</span> <span class="bp">&lt;</span> <span class="n">z</span><span class="o">)</span>
 <span class="k">#check</span> <span class="o">(</span><span class="n">lt_of_lt_of_le</span> <span class="o">:</span> <span class="n">x</span> <span class="bp">&lt;</span> <span class="n">y</span> <span class="bp">&#8594;</span> <span class="n">y</span> <span class="bp">&#8804;</span> <span class="n">z</span> <span class="bp">&#8594;</span> <span class="n">x</span> <span class="bp">&lt;</span> <span class="n">z</span><span class="o">)</span>
@@ -1282,6 +1282,23 @@ and the ordering is reverse inclusion</p></li>
 you can prove the commutativity and associativity of the infimum and supremum
 using only their characterizing axioms,
 together with <code class="docutils literal notranslate"><span class="pre">le_refl</span></code> and <code class="docutils literal notranslate"><span class="pre">le_trans</span></code>.</p>
+<p id="index-29">Using <code class="docutils literal notranslate"><span class="pre">apply</span> <span class="pre">le_trans</span></code> when seeing a goal <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#8804;</span> <span class="pre">z</span></code> is not a great idea.
+Indeed Lean has no way to guess which intermediate element <code class="docutils literal notranslate"><span class="pre">y</span></code> we
+want to use.
+So <code class="docutils literal notranslate"><span class="pre">apply</span> <span class="pre">le_trans</span></code> produces three goals that look like``x &#8804; ?a``, <code class="docutils literal notranslate"><span class="pre">?a</span> <span class="pre">&#8804;</span> <span class="pre">z</span></code>
+and <code class="docutils literal notranslate"><span class="pre">&#945;</span></code> where <code class="docutils literal notranslate"><span class="pre">?a</span></code> (probably with a more complicated auto-generated name) stands
+for the mysterious <code class="docutils literal notranslate"><span class="pre">y</span></code>.
+The last goal, with type <code class="docutils literal notranslate"><span class="pre">&#945;</span></code>, is to provide the value of <code class="docutils literal notranslate"><span class="pre">y</span></code>.
+It comes lasts because Lean hopes to automatically infer it from the proof of
+the first goal <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#8804;</span> <span class="pre">?a</span></code>.
+In order to avoid this unappealing situation, you can use the <code class="docutils literal notranslate"><span class="pre">calc</span></code> tactic
+to explicitly provide <code class="docutils literal notranslate"><span class="pre">y</span></code>.
+Alternatively, you can use the <code class="docutils literal notranslate"><span class="pre">trans</span></code> tactic
+which takes <code class="docutils literal notranslate"><span class="pre">y</span></code> as an argument and produces the expected goals <code class="docutils literal notranslate"><span class="pre">x</span> <span class="pre">&#8804;</span> <span class="pre">y</span></code> and
+<code class="docutils literal notranslate"><span class="pre">y</span> <span class="pre">&#8804;</span> <span class="pre">z</span></code>.
+Of course you can also avoid this issue by providing directly a full proof such as
+<code class="docutils literal notranslate"><span class="pre">exact</span> <span class="pre">le_trans</span> <span class="pre">inf_le_left</span> <span class="pre">inf_le_right</span></code>, but this requires a lot more
+planning.</p>
 <div class="highlight-lean notranslate"><div class="highlight"><pre><span></span><span class="kd">example</span> <span class="o">:</span> <span class="n">x</span> <span class="bp">&#8851;</span> <span class="n">y</span> <span class="bp">=</span> <span class="n">y</span> <span class="bp">&#8851;</span> <span class="n">x</span> <span class="o">:=</span> <span class="kd">by</span>
   <span class="gr">sorry</span>
 
@@ -1371,7 +1388,7 @@ enumerated in the last two examples:</p>
   <span class="gr">sorry</span>
 </pre></div>
 </div>
-<p id="index-29">Finally, here is one last example.
+<p id="index-30">Finally, here is one last example.
 A <em>metric space</em> consists of a set equipped with a notion of
 distance, <code class="docutils literal notranslate"><span class="pre">dist</span> <span class="pre">x</span> <span class="pre">y</span></code>,
 mapping any pair of elements to a real number.
